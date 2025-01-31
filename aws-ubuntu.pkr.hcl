@@ -19,4 +19,13 @@ source "amazon-ebs" "ubuntu" {
 
 build {
   sources = ["source.amazon-ebs.ubuntu"]
+
+  provisioner "shell" {
+    scripts = [
+      "packer-scripts/install-jenkins.sh",
+      "packer-scripts/install-nginx.sh",
+      "packer-scripts/create-config-file.sh",
+      "packer-scripts/install-certbot.sh",
+    ]
+  }
 }
