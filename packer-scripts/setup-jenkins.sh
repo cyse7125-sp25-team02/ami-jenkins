@@ -7,7 +7,7 @@ done
 
 # Create Jenkins init script to disable setup wizard
 sudo mkdir -p /var/lib/jenkins/init.groovy.d
-sudo bash -c 'cat > /var/lib/jenkins/init.groovy.d/basic-security.groovy << EOL
+sudo bash -c "cat > /var/lib/jenkins/init.groovy.d/basic-security.groovy << EOL
 #!groovy
 import jenkins.model.*
 import hudson.security.*
@@ -19,11 +19,11 @@ instance.setInstallState(InstallState.INITIAL_SETUP_COMPLETED)
 def hudsonRealm = new HudsonPrivateSecurityRealm(false)
 instance.setSecurityRealm(hudsonRealm)
 
-def user = hudsonRealm.createAccount(\"${JENKINS_ADMIN_USER}\", \"${JENKINS_ADMIN_PASSWORD}\")
+def user = hudsonRealm.createAccount('${JENKINS_ADMIN_USER}', '${JENKINS_ADMIN_PASSWORD}')
 user.save()
 
 instance.save()
-EOL'
+EOL"
 
 # Set environment variables
 export CASC_JENKINS_CONFIG=/var/lib/jenkins/jenkins.yaml
@@ -47,6 +47,6 @@ sudo chmod -R 755 /var/lib/jenkins
 sudo systemctl restart jenkins
 
 # Wait for Jenkins to start
-until curl -s \"${JENKINS_URL}\" >/dev/null; do
+until curl -s "${JENKINS_URL}" >/dev/null; do
     sleep 5
 done

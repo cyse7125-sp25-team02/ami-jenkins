@@ -2,7 +2,7 @@ name: Packer Validate CI
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Packer Init
-      run: packer init .
+      - name: Packer Init
+        run: packer init .
 
-    - name: Packer Format Check
-      run: packer fmt -check .
+      - name: Packer Format Check
+        run: packer fmt -check .
 
-    - name: Packer Validate
-      run: packer validate .
+      - name: Packer Validate
+        run: packer validate -var "JENKINS_ADMIN_USER=${{secrets.JENKINS_ADMIN_USER}}" -var "JENKINS_ADMIN_PASSWORD=${{secrets.JENKINS_ADMIN_PASSWORD}}" -var "JENKINS_URL=${{secrets.JENKINS_URL}}" .
