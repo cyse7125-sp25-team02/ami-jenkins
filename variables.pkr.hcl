@@ -13,22 +13,22 @@ variable "JENKINS_URL" {
 }
 
 variable "GITHUB_CREDENTIALS_ID" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "GITHUB_USERNAME" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "GITHUB_TOKEN_ID" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "GITHUB_TOKEN" {
-  type = string
+  type      = string
   sensitive = true
 }
 
