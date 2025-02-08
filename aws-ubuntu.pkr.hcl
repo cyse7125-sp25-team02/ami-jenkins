@@ -7,23 +7,8 @@ packer {
   }
 }
 
-variable "JENKINS_ADMIN_USER" {
-  type      = string
-  sensitive = true
-}
-
-variable "JENKINS_ADMIN_PASSWORD" {
-  type      = string
-  sensitive = true
-}
-
-variable "JENKINS_URL" {
-  type = string
-}
-
-
 source "amazon-ebs" "ubuntu" {
-  ami_name              = "karan-jenkins-ami"
+  ami_name              = "jenkins-ami"
   source_ami            = "ami-04b4f1a9cf54c11d0"
   instance_type         = "t2.micro"
   region                = "us-east-1"
@@ -40,7 +25,8 @@ build {
       "packer-scripts/install-jenkins.sh",
       "packer-scripts/install-nginx.sh",
       "packer-scripts/create-config-file.sh",
-      "packer-scripts/install-certbot.sh"
+      "packer-scripts/install-certbot.sh",
+      "packer-scripts/install-terraform.sh"
     ]
     environment_vars = [
       "JENKINS_URL=${var.JENKINS_URL}",
@@ -55,8 +41,8 @@ build {
   }
 
   provisioner "file" {
-    source      = "packer-scripts/plugins.yaml"
-    destination = "/tmp/plugins.yaml"
+    source      = "packer-scripts/create-pipeline-job.groovy"
+    destination = "/tmp/create-pipeline-job.groovy"
   }
 
   provisioner "shell" {
@@ -67,9 +53,14 @@ build {
     environment_vars = [
       "JENKINS_ADMIN_USER=${var.JENKINS_ADMIN_USER}",
       "JENKINS_ADMIN_PASSWORD=${var.JENKINS_ADMIN_PASSWORD}",
-      "JENKINS_URL=${var.JENKINS_URL}"
+      "JENKINS_URL=${var.JENKINS_URL}",
+      "GITHUB_CREDENTIALS_ID=${var.GITHUB_CREDENTIALS_ID}",
+      "GITHUB_USERNAME=${var.GITHUB_USERNAME}",
+      "GITHUB_TOKEN_ID=${var.GITHUB_TOKEN_ID}",
+      "GITHUB_TOKEN=${var.GITHUB_TOKEN}",
+      "GITHUB_REPO_URL=${var.GITHUB_REPO_URL}",
+      "GITHUB_ORG=${var.GITHUB_ORG}",
+      "GITHUB_REPO=${var.GITHUB_REPO}"
     ]
   }
-
-
 }
