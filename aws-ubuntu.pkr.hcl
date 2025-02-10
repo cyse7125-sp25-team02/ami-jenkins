@@ -41,8 +41,8 @@ build {
   }
 
   provisioner "file" {
-    source      = "packer-scripts/create-pipeline-job.groovy"
-    destination = "/tmp/create-pipeline-job.groovy"
+    source      = "packer-scripts/z-create-pipeline-job.groovy"
+    destination = "/tmp/z-create-pipeline-job.groovy"
   }
 
   provisioner "shell" {
