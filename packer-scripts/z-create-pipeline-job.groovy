@@ -79,15 +79,21 @@ node() {
             }
             
             stage('Terraform Init') {
-                sh 'terraform init'
+                withEnv(['TF_IN_AUTOMATION=true', 'TF_INPUT=false']) {
+                    sh 'terraform init'
+                }
             }
             
             stage('Terraform Format Check') {
-                sh 'terraform fmt -check'
+                withEnv(['TF_IN_AUTOMATION=true', 'TF_INPUT=false']) {
+                    sh 'terraform fmt -check'
+                }
             }
             
             stage('Terraform Validate') {
-                sh 'terraform validate .'
+                withEnv(['TF_IN_AUTOMATION=true', 'TF_INPUT=false']) {
+                    sh 'terraform validate'
+                }
             }
         } finally {
             deleteDir()
