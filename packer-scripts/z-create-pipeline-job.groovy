@@ -15,21 +15,21 @@ import java.util.Properties
 import hudson.model.StringParameterDefinition
 import hudson.model.ParametersDefinitionProperty
 
-def props = new Properties()
-def envFile = new File('/etc/jenkins.env')
+Properties props = new Properties()
+File envFile = new File('/etc/jenkins.env')
 if (envFile.exists()) {
     props.load(envFile.newDataInputStream())
 } else {
     throw new RuntimeException("/etc/jenkins.env file not found")
 }
 
-def githubCredentialsId = props.getProperty('GITHUB_CREDENTIALS_ID')
-def githubUsername = props.getProperty('GITHUB_USERNAME')
-def githubTokenId = props.getProperty('GITHUB_TOKEN_ID')
-def githubToken = props.getProperty('GITHUB_TOKEN')
-def githubRepoUrl = props.getProperty('GITHUB_REPO_URL')
-def githubOrg = props.getProperty('GITHUB_ORG')
-def githubRepo = props.getProperty('GITHUB_REPO')
+String githubCredentialsId = props.getProperty('GITHUB_CREDENTIALS_ID')
+String githubUsername = props.getProperty('GITHUB_USERNAME')
+String githubTokenId = props.getProperty('GITHUB_TOKEN_ID')
+String githubToken = props.getProperty('GITHUB_TOKEN')
+String githubRepoUrl = props.getProperty('GITHUB_REPO_URL')
+String githubOrg = props.getProperty('GITHUB_ORG')
+String githubRepo = props.getProperty('GITHUB_REPO')
 
 // Jenkins instance setup
 def instance = Jenkins.instance
@@ -56,14 +56,11 @@ store.addCredentials(domain, githubCred)
 
 def jobName = 'Terraform PR Validation'
 
-def pipelineScript = """
-node('any') {
+def pipelineScript = '''
+node() {
     properties([
         pipelineTriggers([
-            [\$class: 'GitHubPullRequestTrigger', 
-            triggerOnPullRequest: true, 
-            branchRestriction: 'master', 
-            useGitHubHooks: true]
+            githubPush()
         ])
     ])
     
@@ -71,12 +68,12 @@ node('any') {
         try {
             stage('Checkout') {
                 checkout([
-                    \$class: 'GitSCM',
-                    branches: [[name: env.CHANGE_BRANCH]],
+                    $class: 'GitSCM',
+                    branches: [[name: env.CHANGE_BRANCH ?: env.BRANCH_NAME ?: 'master']],
                     extensions: [],
                     userRemoteConfigs: [[
-                        url: ${githubRepoUrl},
-                        credentialsId: ${githubCredentialsId}
+                        url: "''' + githubRepoUrl + '''",
+                        credentialsId: "''' + githubCredentialsId + '''"
                     ]]
                 ])
             }
@@ -90,33 +87,32 @@ node('any') {
             }
             
             stage('Terraform Validate') {
-                sh 'terraform validate'
+                sh 'terraform validate .'
             }
         } finally {
             deleteDir()
             
             if (env.CHANGE_ID) {
-                def statusMessage = '''
-                **Terraform Validation Results**
-                - Status: \${currentBuild.result == 'SUCCESS' ? '✅ Success' : '❌ Failure'}
-                - Build Number: #\${env.BUILD_NUMBER}
-                - Console Log: \${env.RUN_DISPLAY_URL}
-                '''
-                
-                withCredentials([string(credentialsId: ${githubTokenId}, variable: 'GITHUB_TOKEN')]) {
-                    sh '''
-                    curl -sS -X POST \\
-                        -H "Authorization: token \$GITHUB_TOKEN" \\
-                        -H "Accept: application/vnd.github.v3+json" \\
-                        "https://api.github.com/repos/${githubOrg}/${githubRepo}/issues/\${env.CHANGE_ID}/comments" \\
-                        -d "{\\"body\\": \\"\${statusMessage.replace('"', '\\\\"')}\\"}"
-                    '''
+                script {
+                    def status = currentBuild.result == null ? 'SUCCESS' : currentBuild.result
+                    def statusEmoji = status == 'SUCCESS' ? '✅' : '❌'
+                    def commentBody = "**Terraform Validation Results**\\n- Status: ${statusEmoji} ${status}\\n- Build Number: #${env.BUILD_NUMBER}\\n- Console Log: ${env.RUN_DISPLAY_URL}"
+                    
+                    withCredentials([string(credentialsId: "''' + githubTokenId + '''", variable: 'GITHUB_TOKEN')]) {
+                        sh """
+                            curl -sS -X POST \\
+                                -H "Authorization: token \${GITHUB_TOKEN}" \\
+                                -H "Accept: application/vnd.github.v3+json" \\
+                                "https://api.github.com/repos/''' + githubOrg + '''/''' + githubRepo + '''/issues/\${CHANGE_ID}/comments" \\
+                                -d "{\\"body\\": \\"${commentBody}\\"}"
+                        """
+                    }
                 }
             }
         }
     }
 }
-"""
+'''
 
 def job = new WorkflowJob(instance, jobName)
 job.definition = new CpsFlowDefinition(pipelineScript, true)
