@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Wait for Jenkins to be installed
-sleep 5
+sudo systemctl stop jenkins
 
 # Create Jenkins init script to disable setup wizard
 sudo mkdir -p /var/lib/jenkins/init.groovy.d
@@ -32,6 +32,7 @@ sudo bash -c 'cat > /etc/default/jenkins << EOL
 JENKINS_HOME=/var/lib/jenkins
 JENKINS_ARGS="--webroot=/var/cache/jenkins/war --httpPort=8080"
 JAVA_ARGS="-Djenkins.install.runSetupWizard=false -Dcasc.jenkins.config=/var/lib/jenkins/jenkins.yaml -Djenkins.security.ApiTokenProperty.adminCanGenerateNewTokens=true"
+CASC_JENKINS_CONFIG=/var/lib/jenkins/jenkins.yaml
 EOL'
 
 # Install plugins from plugins.yaml
@@ -40,30 +41,18 @@ sudo bash -c "cat > /var/lib/jenkins/init.groovy.d/install-plugins.groovy << EOL
 import jenkins.model.*
 
 def pluginsToInstall = [
-    'cloudbees-folder',
-    'antisamy-markup-formatter',
-    'build-timeout',
+    'github-branch-source',
+    'workflow-aggregator',
+    'git',
     'credentials-binding',
+    'pipeline-utility-steps',
+    'github-pullrequest',
     'timestamper',
     'ws-cleanup',
-    'ant',
-    'gradle',
-    'workflow-aggregator',
-    'github-branch-source',
-    'pipeline-github-lib',
-    'pipeline-stage-view',
-    'git',
-    'ssh-slaves',
-    'matrix-auth',
-    'pam-auth',
-    'ldap',
     'email-ext',
-    'mailer',
-    'pipeline-utility-steps',
     'terraform',
-    'github-pullrequest',
-    'job-dsl',
-    'ghprb'
+    'credentials',
+    'github'
 ]
 
 def instance = Jenkins.get()
@@ -82,25 +71,30 @@ pluginsToInstall.each { pluginName ->
 }
 EOL"
 
-echo "JENKINS_ADMIN_USER='${JENKINS_ADMIN_USER}'" | sudo tee -a /etc/default/jenkins
-echo "JENKINS_ADMIN_PASSWORD='${JENKINS_ADMIN_PASSWORD}'" | sudo tee -a /etc/default/jenkins
-echo "JENKINS_URL='${JENKINS_URL}'" | sudo tee -a /etc/default/jenkins
-echo "GITHUB_CREDENTIALS_ID='${GITHUB_CREDENTIALS_ID}'" | sudo tee -a /etc/default/jenkins
-echo "GITHUB_USERNAME='${GITHUB_USERNAME}'" | sudo tee -a /etc/default/jenkins
-echo "GITHUB_TOKEN_ID='${GITHUB_TOKEN_ID}'" | sudo tee -a /etc/default/jenkins
-echo "GITHUB_TOKEN='${GITHUB_TOKEN}'" | sudo tee -a /etc/default/jenkins
-echo "GITHUB_REPO_URL='${GITHUB_REPO_URL}'" | sudo tee -a /etc/default/jenkins
-echo "GITHUB_ORG='${GITHUB_ORG}'" | sudo tee -a /etc/default/jenkins
-echo "GITHUB_REPO='${GITHUB_REPO}'" | sudo tee -a /etc/default/jenkins
+sudo tee /etc/jenkins.env > /dev/null <<EOF
+JENKINS_ADMIN_USER=${JENKINS_ADMIN_USER}
+JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
+JENKINS_URL=${JENKINS_URL}
+GITHUB_CREDENTIALS_ID=${GITHUB_CREDENTIALS_ID}
+GITHUB_USERNAME=${GITHUB_USERNAME}
+GITHUB_TOKEN_ID=${GITHUB_TOKEN_ID}
+GITHUB_TOKEN=${GITHUB_TOKEN}
+GITHUB_REPO_URL=${GITHUB_REPO_URL}
+GITHUB_ORG=${GITHUB_ORG}
+GITHUB_REPO=${GITHUB_REPO}
+EOF
 
-sudo mv /tmp/create-pipeline-job.groovy /var/lib/jenkins/init.groovy.d/
+sudo mv /tmp/z-create-pipeline-job.groovy /var/lib/jenkins/init.groovy.d/
 
 # Set correct permissions
 sudo chown -R jenkins:jenkins /var/lib/jenkins
 sudo chmod -R 755 /var/lib/jenkins
 
+sudo chown jenkins:jenkins /etc/jenkins.env
+sudo chmod 600 /etc/jenkins.env
+
 # Restart Jenkins to apply changes
 sudo systemctl restart jenkins
 
 # Wait for Jenkins to start
-sleep 5
+sleep 60
