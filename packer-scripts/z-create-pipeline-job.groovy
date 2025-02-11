@@ -14,6 +14,7 @@ import com.coravy.hudson.plugins.github.GithubProjectProperty
 import java.util.Properties
 import hudson.model.StringParameterDefinition
 import hudson.model.ParametersDefinitionProperty
+import hudson.model.*
 
 Properties props = new Properties()
 File envFile = new File('/etc/jenkins.env')
@@ -133,6 +134,13 @@ node() {
 }
 '''
 
-def job = new WorkflowJob(instance, jobName)
-job.definition = new CpsFlowDefinition(pipelineScript, true)
+// Create job
+def pipelineJob = new WorkflowJob(instance, jobName)
+pipelineJob.definition = new CpsFlowDefinition(pipelineScript, true)
 instance.reload()
+
+// Trigger job
+if (Jenkins.instance.getItem(jobName)) {
+    Jenkins.instance.getItem(jobName).scheduleBuild2(0)
+    println "Triggered job: ${jobName}"
+}
