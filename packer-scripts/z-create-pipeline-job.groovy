@@ -32,12 +32,10 @@ String githubRepoUrl = props.getProperty('GITHUB_REPO_URL')
 String githubOrg = props.getProperty('GITHUB_ORG')
 String githubRepo = props.getProperty('GITHUB_REPO')
 
-// Jenkins instance setup
 def instance = Jenkins.instance
 def domain = Domain.global()
 def store = instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
 
-// Create credentials
 def tokenCred = new StringCredentialsImpl(
     CredentialsScope.GLOBAL,
     githubTokenId,
@@ -65,7 +63,8 @@ node() {
                 $class: 'GenericTrigger',
                 genericVariables: [
                     [key: 'action', value: '$.action'],
-                    [key: 'pull_request_number', value: '$.pull_request.number']
+                    [key: 'pull_request_number', value: '$.pull_request.number'],
+                    [key: 'pull_request_sha', value: '$.pull_request.head.sha']
                 ],
                 causeString: 'PR $pull_request_number $action',
                 token: "''' + githubToken + '''",
@@ -78,15 +77,20 @@ node() {
     timeout(time: 15, unit: 'MINUTES') {
         try {
             stage('Checkout') {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: env.CHANGE_BRANCH ?: env.BRANCH_NAME ?: 'master']],
-                    extensions: [[$class: 'CleanBeforeCheckout']],
-                    userRemoteConfigs: [[
-                        url: "''' + githubRepoUrl + '''",
-                        credentialsId: "''' + githubCredentialsId + '''"
-                    ]]
-                ])
+                script {
+                    def isPR = env.pull_request_number?.trim()
+                    
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: isPR ? "origin/pr/${pull_request_number}/head" : 'master']],
+                        extensions: [[$class: 'CleanBeforeCheckout']],
+                        userRemoteConfigs: [[
+                            url: "''' + githubRepoUrl + '''",
+                            credentialsId: "''' + githubCredentialsId + '''",
+                            refspec: isPR ? '+refs/pull/*/head:refs/remotes/origin/pr/*/head' : '+refs/heads/*:refs/remotes/origin/*'
+                        ]]
+                    ])
+                }
             }
             
             stage('Terraform Init') {
@@ -106,40 +110,53 @@ node() {
                     sh 'terraform validate -no-color'
                 }
             }
+        } catch (Exception e) {
+            currentBuild.result = 'FAILURE'
+            throw e
         } finally {
-            deleteDir()
-            
-            if (env.CHANGE_ID) {
-                script {
-                    def status = currentBuild.result == null ? 'SUCCESS' : currentBuild.result
+            script {
+                if (env.pull_request_number) {
+                    def status = currentBuild.result ?: 'SUCCESS'
                     def statusEmoji = status == 'SUCCESS' ? '✅' : '❌'
-                    def commentBody = """**Terraform Validation Results**
-- Status: ${statusEmoji} ${status}
-- Build Number: #${env.BUILD_NUMBER}
-- Console Log: ${env.RUN_DISPLAY_URL}"""
                     
                     withCredentials([string(credentialsId: "''' + githubTokenId + '''", variable: 'GITHUB_TOKEN')]) {
-                        sh """
-                            curl -sS -X POST \\
-                                -H "Authorization: token ${GITHUB_TOKEN}" \\
-                                -H "Accept: application/vnd.github.v3+json" \\
-                                "https://api.github.com/repos/''' + githubOrg + '''/''' + githubRepo + '''/issues/${CHANGE_ID}/comments" \\
-                                -d '{"body": "${commentBody.replaceAll('\\n', '\\\\n')}"}'
-                        """
+                        try {
+                            def commentBody = """**Terraform Validation Results**
+- Status: ${statusEmoji} ${status}
+- Build Number: #${env.BUILD_NUMBER}
+- Console Log: ${env.BUILD_URL}"""
+
+                            def jsonBody = groovy.json.JsonOutput.toJson([body: commentBody])
+                            writeFile file: 'comment.json', text: jsonBody
+                            
+                            sh """#!/bin/bash
+                                set -e
+                                curl -sS -X POST \\
+                                    -H 'Authorization: token '\$GITHUB_TOKEN \\
+                                    -H 'Accept: application/vnd.github.v3+json' \\
+                                    'https://api.github.com/repos/''' + githubOrg + '''/''' + githubRepo + '''/issues/'${env.pull_request_number}'/comments' \\
+                                    -d @comment.json
+                            """
+                        } catch (Exception e) {
+                            echo "Failed to post GitHub comment: ${e.getMessage()}"
+                        } finally {
+                            sh 'rm -f comment.json || true'
+                        }
                     }
+                } else {
+                    echo "Skipping GitHub comment - not a PR build"
                 }
             }
+            deleteDir()
         }
     }
 }
 '''
 
-// Create job
 def pipelineJob = new WorkflowJob(instance, jobName)
 pipelineJob.definition = new CpsFlowDefinition(pipelineScript, true)
 instance.reload()
 
-// Trigger job
 if (Jenkins.instance.getItem(jobName)) {
     Jenkins.instance.getItem(jobName).scheduleBuild2(0)
     println "Triggered job: ${jobName}"
