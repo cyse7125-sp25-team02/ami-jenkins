@@ -52,7 +52,8 @@ def pluginsToInstall = [
     'email-ext',
     'terraform',
     'credentials',
-    'github'
+    'github',
+    'generic-webhook-trigger'
 ]
 
 def instance = Jenkins.get()

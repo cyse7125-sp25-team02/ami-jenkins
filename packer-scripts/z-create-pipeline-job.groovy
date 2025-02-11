@@ -60,7 +60,17 @@ def pipelineScript = '''
 node() {
     properties([
         pipelineTriggers([
-            githubPush()
+            [
+                $class: 'GenericTrigger',
+                genericVariables: [
+                    [key: 'action', value: '$.action'],
+                    [key: 'pull_request_number', value: '$.pull_request.number']
+                ],
+                causeString: 'PR $pull_request_number $action',
+                token: "''' + githubToken + '''",
+                regexpFilterText: '$action',
+                regexpFilterExpression: '(opened|reopened|synchronize)'
+            ]
         ])
     ])
     
@@ -70,7 +80,7 @@ node() {
                 checkout([
                     $class: 'GitSCM',
                     branches: [[name: env.CHANGE_BRANCH ?: env.BRANCH_NAME ?: 'master']],
-                    extensions: [],
+                    extensions: [[$class: 'CleanBeforeCheckout']],
                     userRemoteConfigs: [[
                         url: "''' + githubRepoUrl + '''",
                         credentialsId: "''' + githubCredentialsId + '''"
@@ -80,19 +90,19 @@ node() {
             
             stage('Terraform Init') {
                 withEnv(['TF_IN_AUTOMATION=true', 'TF_INPUT=false']) {
-                    sh 'terraform init'
+                    sh 'terraform init -no-color'
                 }
             }
             
             stage('Terraform Format Check') {
                 withEnv(['TF_IN_AUTOMATION=true', 'TF_INPUT=false']) {
-                    sh 'terraform fmt -check'
+                    sh 'terraform fmt -check -no-color'
                 }
             }
             
             stage('Terraform Validate') {
                 withEnv(['TF_IN_AUTOMATION=true', 'TF_INPUT=false']) {
-                    sh 'terraform validate'
+                    sh 'terraform validate -no-color'
                 }
             }
         } finally {
@@ -102,15 +112,18 @@ node() {
                 script {
                     def status = currentBuild.result == null ? 'SUCCESS' : currentBuild.result
                     def statusEmoji = status == 'SUCCESS' ? '✅' : '❌'
-                    def commentBody = "**Terraform Validation Results**\\n- Status: ${statusEmoji} ${status}\\n- Build Number: #${env.BUILD_NUMBER}\\n- Console Log: ${env.RUN_DISPLAY_URL}"
+                    def commentBody = """**Terraform Validation Results**
+- Status: ${statusEmoji} ${status}
+- Build Number: #${env.BUILD_NUMBER}
+- Console Log: ${env.RUN_DISPLAY_URL}"""
                     
                     withCredentials([string(credentialsId: "''' + githubTokenId + '''", variable: 'GITHUB_TOKEN')]) {
                         sh """
                             curl -sS -X POST \\
-                                -H "Authorization: token \${GITHUB_TOKEN}" \\
+                                -H "Authorization: token ${GITHUB_TOKEN}" \\
                                 -H "Accept: application/vnd.github.v3+json" \\
-                                "https://api.github.com/repos/''' + githubOrg + '''/''' + githubRepo + '''/issues/\${CHANGE_ID}/comments" \\
-                                -d "{\\"body\\": \\"${commentBody}\\"}"
+                                "https://api.github.com/repos/''' + githubOrg + '''/''' + githubRepo + '''/issues/${CHANGE_ID}/comments" \\
+                                -d '{"body": "${commentBody.replaceAll('\\n', '\\\\n')}"}'
                         """
                     }
                 }
