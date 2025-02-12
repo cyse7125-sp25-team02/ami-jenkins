@@ -24,13 +24,13 @@ if (envFile.exists()) {
     throw new RuntimeException("/etc/jenkins.env file not found")
 }
 
-String githubCredentialsId = props.getProperty('GITHUB_CREDENTIALS_ID')
-String githubUsername = props.getProperty('GITHUB_USERNAME')
-String githubTokenId = props.getProperty('GITHUB_TOKEN_ID')
-String githubToken = props.getProperty('GITHUB_TOKEN')
-String githubRepoUrl = props.getProperty('GITHUB_REPO_URL')
-String githubOrg = props.getProperty('GITHUB_ORG')
-String githubRepo = props.getProperty('GITHUB_REPO')
+String githubCredentialsId = props.getProperty('GITHUBB_CREDENTIALS_ID')
+String githubUsername = props.getProperty('GITHUBB_USERNAME')
+String githubTokenId = props.getProperty('GITHUBB_TOKEN_ID')
+String githubToken = props.getProperty('GITHUBB_TOKEN')
+String githubRepoUrl = props.getProperty('GITHUBB_REPO_URL')
+String githubOrg = props.getProperty('GITHUBB_ORG')
+String githubRepo = props.getProperty('GITHUBB_REPO')
 
 def instance = Jenkins.instance
 def domain = Domain.global()

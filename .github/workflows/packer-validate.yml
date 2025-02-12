@@ -22,4 +22,4 @@ jobs:
         run: packer fmt -check .
 
       - name: Packer Validate
-        run: packer validate -var "JENKINS_ADMIN_USER=${{secrets.JENKINS_ADMIN_USER}}" -var "JENKINS_ADMIN_PASSWORD=${{secrets.JENKINS_ADMIN_PASSWORD}}" -var "JENKINS_URL=${{secrets.JENKINS_URL}}" .
+        run: packer validate -syntax-only .

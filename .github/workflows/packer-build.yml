@@ -23,4 +23,16 @@ jobs:
         run: packer init .
 
       - name: Packer Build
-        run: packer build -var "JENKINS_ADMIN_USER=${{secrets.JENKINS_ADMIN_USER}}" -var "JENKINS_ADMIN_PASSWORD=${{secrets.JENKINS_ADMIN_PASSWORD}}" -var "JENKINS_URL=${{secrets.JENKINS_URL}}" .
+        run: |
+          packer build \
+            -var "JENKINS_ADMIN_USER=${{ secrets.JENKINS_ADMIN_USER }}" \
+            -var "JENKINS_ADMIN_PASSWORD=${{ secrets.JENKINS_ADMIN_PASSWORD }}" \
+            -var "JENKINS_URL=${{ secrets.JENKINS_URL }}" \
+            -var "GITHUBB_CREDENTIALS_ID=${{ secrets.GITHUBB_CREDENTIALS_ID }}" \
+            -var "GITHUBB_USERNAME=${{ secrets.GITHUBB_USERNAME }}" \
+            -var "GITHUBB_TOKEN_ID=${{ secrets.GITHUBB_TOKEN_ID }}" \
+            -var "GITHUBB_TOKEN=${{ secrets.GITHUBB_TOKEN }}" \
+            -var "GITHUBB_REPO_URL=${{ secrets.GITHUBB_REPO_URL }}" \
+            -var "GITHUBB_ORG=${{ secrets.GITHUBB_ORG }}" \
+            -var "GITHUBB_REPO=${{ secrets.GITHUBB_REPO }}" \
+            .
