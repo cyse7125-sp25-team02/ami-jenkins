@@ -12,34 +12,34 @@ variable "JENKINS_URL" {
   type = string
 }
 
-variable "GITHUB_CREDENTIALS_ID" {
+variable "GITHUBB_CREDENTIALS_ID" {
   type      = string
   sensitive = true
 }
 
-variable "GITHUB_USERNAME" {
+variable "GITHUBB_USERNAME" {
   type      = string
   sensitive = true
 }
 
-variable "GITHUB_TOKEN_ID" {
+variable "GITHUBB_TOKEN_ID" {
   type      = string
   sensitive = true
 }
 
-variable "GITHUB_TOKEN" {
+variable "GITHUBB_TOKEN" {
   type      = string
   sensitive = true
 }
 
-variable "GITHUB_REPO_URL" {
+variable "GITHUBB_REPO_URL" {
   type = string
 }
 
-variable "GITHUB_ORG" {
+variable "GITHUBB_ORG" {
   type = string
 }
 
-variable "GITHUB_REPO" {
+variable "GITHUBB_REPO" {
   type = string
 }
