@@ -24,6 +24,7 @@ if (envFile.exists()) {
     throw new RuntimeException("/etc/jenkins.env file not found")
 }
 
+String jenkinsUrl = props.getProperty('JENKINS_URL')
 String githubCredentialsId = props.getProperty('GITHUBB_CREDENTIALS_ID')
 String githubUsername = props.getProperty('GITHUBB_USERNAME')
 String githubTokenId = props.getProperty('GITHUBB_TOKEN_ID')
@@ -31,6 +32,10 @@ String githubToken = props.getProperty('GITHUBB_TOKEN')
 String githubRepoUrl = props.getProperty('GITHUBB_REPO_URL')
 String githubOrg = props.getProperty('GITHUBB_ORG')
 String githubRepo = props.getProperty('GITHUBB_REPO')
+
+JenkinsLocationConfiguration location = JenkinsLocationConfiguration.get()
+location.setUrl(jenkinsUrl)
+location.save()
 
 def instance = Jenkins.instance
 def domain = Domain.global()
@@ -61,6 +66,7 @@ def githubSource = new GitHubSCMSource(
     githubRepo
 )
 githubSource.setCredentialsId(githubCredentialsId)
+githubSource.setApiUri("https://api.github.com")
 
 List<SCMSourceTrait> traits = [
     new BranchDiscoveryTrait(1),
