@@ -1,20 +1,20 @@
 import jenkins.model.*
-import org.jenkinsci.plugins.workflow.job.*
-import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition
+import org.jenkinsci.plugins.workflow.multibranch.*
+import jenkins.branch.*
+import jenkins.plugins.git.*
+import org.jenkinsci.plugins.github_branch_source.*
+import com.cloudbees.hudson.plugins.folder.*
 import com.cloudbees.plugins.credentials.domains.Domain
 import org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl
 import com.cloudbees.plugins.credentials.CredentialsScope
 import hudson.util.Secret
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
 import com.cloudbees.plugins.credentials.*
-import org.jenkinsci.plugins.github_branch_source.*
-import com.coravy.hudson.plugins.github.GithubProjectProperty
-import java.util.Properties
-import hudson.model.*
-import org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition
-import hudson.plugins.git.GitSCM
-import hudson.plugins.git.UserRemoteConfig
-import java.util.Collections
+import jenkins.scm.api.trait.SCMSourceTrait
+import jenkins.branch.DefaultBranchPropertyStrategy
+import jenkins.branch.BranchSource
+import org.jenkinsci.plugins.github_branch_source.BranchDiscoveryTrait
+import org.jenkinsci.plugins.github_branch_source.OriginPullRequestDiscoveryTrait
 
 Properties props = new Properties()
 File envFile = new File('/etc/jenkins.env')
@@ -53,24 +53,24 @@ def githubCred = new UsernamePasswordCredentialsImpl(
 )
 store.addCredentials(domain, githubCred)
 
-def jobName = 'Terraform PR Validation'
+def folder = instance.createProject(Folder.class, "infra-jenkins")
+def multibranchJob = folder.createProject(WorkflowMultiBranchProject.class, "terraform-validation")
 
-def pipelineJob = new WorkflowJob(instance, jobName)
-def userRemoteConfig = new UserRemoteConfig(githubRepoUrl, "origin", null, githubCredentialsId)
-def scmConfig = new GitSCM(
-    Collections.singletonList(userRemoteConfig),
-    Collections.emptyList(),
-    false,
-    Collections.emptyList(),
-    null,
-    null,
-    Collections.emptyList()
+def githubSource = new GitHubSCMSource(
+    githubOrg,
+    githubRepo
 )
+githubSource.setCredentialsId(githubCredentialsId)
 
-pipelineJob.setDefinition(new CpsScmFlowDefinition(scmConfig, "Jenkinsfile"))
-instance.reload()
+List<SCMSourceTrait> traits = [
+    new BranchDiscoveryTrait(1),
+    new OriginPullRequestDiscoveryTrait(1),
+    new ForkPullRequestDiscoveryTrait(1, new ForkPullRequestDiscoveryTrait.TrustPermission())
+]
+githubSource.setTraits(traits)
 
-if (Jenkins.instance.getItem(jobName)) {
-    Jenkins.instance.getItem(jobName).scheduleBuild2(0)
-    println "Triggered job: ${jobName}"
-}
+def branchSource = new BranchSource(githubSource)
+multibranchJob.getSourcesList().add(branchSource)
+
+multibranchJob.save()
+multibranchJob.scheduleBuild()
