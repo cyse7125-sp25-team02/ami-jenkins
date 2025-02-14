@@ -53,7 +53,9 @@ def pluginsToInstall = [
     'terraform',
     'credentials',
     'github',
-    'generic-webhook-trigger'
+    'generic-webhook-trigger',
+    'docker-workflow',
+    'docker-commons'
 ]
 
 def instance = Jenkins.get()
@@ -83,6 +85,10 @@ GITHUBB_TOKEN=${GITHUBB_TOKEN}
 GITHUBB_REPO_URL=${GITHUBB_REPO_URL}
 GITHUBB_ORG=${GITHUBB_ORG}
 GITHUBB_REPO=${GITHUBB_REPO}
+STATIC_SITE_REPO=${STATIC_SITE_REPO}
+DOCKER_USERNAME=${DOCKER_USERNAME}
+DOCKER_TOKEN=${DOCKER_TOKEN}
+DOCKER_IMAGE=${DOCKER_IMAGE}
 EOF
 
 sudo mv /tmp/z-create-pipeline-job.groovy /var/lib/jenkins/init.groovy.d/

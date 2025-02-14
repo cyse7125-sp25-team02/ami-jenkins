@@ -43,3 +43,20 @@ variable "GITHUBB_ORG" {
 variable "GITHUBB_REPO" {
   type = string
 }
+
+variable "STATIC_SITE_REPO" {
+  type = string
+}
+
+variable "DOCKER_USERNAME" {
+  type = string
+}
+
+variable "DOCKER_TOKEN" {
+  type      = string
+  sensitive = true
+}
+
+variable "DOCKER_IMAGE" {
+  type = string
+}

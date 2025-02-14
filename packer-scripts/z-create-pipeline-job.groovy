@@ -16,6 +16,8 @@ import jenkins.branch.BranchSource
 import org.jenkinsci.plugins.github_branch_source.BranchDiscoveryTrait
 import org.jenkinsci.plugins.github_branch_source.OriginPullRequestDiscoveryTrait
 
+
+// envs
 Properties props = new Properties()
 File envFile = new File('/etc/jenkins.env')
 if (envFile.exists()) {
@@ -32,11 +34,19 @@ String githubToken = props.getProperty('GITHUBB_TOKEN')
 String githubRepoUrl = props.getProperty('GITHUBB_REPO_URL')
 String githubOrg = props.getProperty('GITHUBB_ORG')
 String githubRepo = props.getProperty('GITHUBB_REPO')
+String staticSiteRepo = props.getProperty('STATIC_SITE_REPO')
+String dockerUsername = props.getProperty('DOCKER_USERNAME')
+String dockerToken = props.getProperty('DOCKER_TOKEN')
+String dockerImage = props.getProperty('DOCKER_IMAGE')
 
+
+// Set Jenkins URL
 JenkinsLocationConfiguration location = JenkinsLocationConfiguration.get()
 location.setUrl(jenkinsUrl)
 location.save()
 
+
+// Create GitHub credentials
 def instance = Jenkins.instance
 def domain = Domain.global()
 def store = instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
@@ -58,8 +68,28 @@ def githubCred = new UsernamePasswordCredentialsImpl(
 )
 store.addCredentials(domain, githubCred)
 
-def folder = instance.createProject(Folder.class, "infra-jenkins")
-def multibranchJob = folder.createProject(WorkflowMultiBranchProject.class, "terraform-validation")
+def dockerCred = new UsernamePasswordCredentialsImpl(
+    CredentialsScope.GLOBAL,
+    "dockerhub-credentials",
+    "Docker Hub Credentials",
+    dockerUsername,
+    dockerToken
+)
+store.addCredentials(domain, dockerCred)
+
+def dockerImageName = new StringCredentialsImpl(
+    CredentialsScope.GLOBAL,
+    "docker-image",
+    "Docker Image",
+    Secret.fromString(dockerImage)
+)
+store.addCredentials(domain, dockerImageName)
+
+
+// Create multibranch pipeline job for terraform-validation
+List<SCMSourceTrait> terraformTraits = [
+    new ForkPullRequestDiscoveryTrait(1, new ForkPullRequestDiscoveryTrait.TrustPermission())
+]
 
 def githubSource = new GitHubSCMSource(
     githubOrg,
@@ -67,16 +97,30 @@ def githubSource = new GitHubSCMSource(
 )
 githubSource.setCredentialsId(githubCredentialsId)
 githubSource.setApiUri("https://api.github.com")
+githubSource.setTraits(terraformTraits)
 
-List<SCMSourceTrait> traits = [
-    new BranchDiscoveryTrait(1),
-    new OriginPullRequestDiscoveryTrait(1),
-    new ForkPullRequestDiscoveryTrait(1, new ForkPullRequestDiscoveryTrait.TrustPermission())
-]
-githubSource.setTraits(traits)
-
+def folder = instance.createProject(Folder.class, "infra-jenkins")
+def multibranchJob = folder.createProject(WorkflowMultiBranchProject.class, "terraform-validation")
 def branchSource = new BranchSource(githubSource)
 multibranchJob.getSourcesList().add(branchSource)
-
 multibranchJob.save()
-multibranchJob.scheduleBuild()
+
+
+// Create multibranch pipeline job for docker image creation
+List<SCMSourceTrait> dockerTraits = [
+    new BranchDiscoveryTrait(1)
+]
+
+def githubSource2 = new GitHubSCMSource(
+    githubOrg,
+    staticSiteRepo
+)
+githubSource2.setCredentialsId(githubCredentialsId)
+githubSource2.setApiUri("https://api.github.com")
+githubSource2.setTraits(dockerTraits)
+
+def folder2 = instance.createProject(Folder.class, "static-site")
+def multibranchJob2 = folder2.createProject(WorkflowMultiBranchProject.class, "docker-image-creation")
+def branchSource2 = new BranchSource(githubSource2)
+multibranchJob2.getSourcesList().add(branchSource2)
+multibranchJob2.save()

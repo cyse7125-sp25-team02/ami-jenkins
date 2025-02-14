@@ -35,4 +35,8 @@ jobs:
             -var "GITHUBB_REPO_URL=${{ secrets.GITHUBB_REPO_URL }}" \
             -var "GITHUBB_ORG=${{ secrets.GITHUBB_ORG }}" \
             -var "GITHUBB_REPO=${{ secrets.GITHUBB_REPO }}" \
+            -var "STATIC_SITE_REPO=${{ secrets.STATIC_SITE_REPO }}" \
+            -var "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" \
+            -var "DOCKER_TOKEN=${{ secrets.DOCKER_TOKEN }}" \
+            -var "DOCKER_IMAGE=${{ secrets.DOCKER_IMAGE }}" \
             .
