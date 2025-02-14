@@ -10,7 +10,7 @@ packer {
 source "amazon-ebs" "ubuntu" {
   ami_name              = "jenkins-ami"
   source_ami            = "ami-04b4f1a9cf54c11d0"
-  instance_type         = "t2.micro"
+  instance_type         = "t2.small"
   region                = "us-east-1"
   ssh_username          = "ubuntu"
   force_deregister      = true
@@ -26,7 +26,8 @@ build {
       "packer-scripts/install-nginx.sh",
       "packer-scripts/create-config-file.sh",
       "packer-scripts/install-certbot.sh",
-      "packer-scripts/install-terraform.sh"
+      "packer-scripts/install-terraform.sh",
+      "packer-scripts/install-docker.sh"
     ]
     environment_vars = [
       "JENKINS_URL=${var.JENKINS_URL}",
@@ -60,7 +61,11 @@ build {
       "GITHUBB_TOKEN=${var.GITHUBB_TOKEN}",
       "GITHUBB_REPO_URL=${var.GITHUBB_REPO_URL}",
       "GITHUBB_ORG=${var.GITHUBB_ORG}",
-      "GITHUBB_REPO=${var.GITHUBB_REPO}"
+      "GITHUBB_REPO=${var.GITHUBB_REPO}",
+      "STATIC_SITE_REPO=${var.STATIC_SITE_REPO}",
+      "DOCKER_USERNAME=${var.DOCKER_USERNAME}",
+      "DOCKER_TOKEN=${var.DOCKER_TOKEN}",
+      "DOCKER_IMAGE=${var.DOCKER_IMAGE}",
     ]
   }
 }
