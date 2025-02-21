@@ -31,10 +31,10 @@ String githubCredentialsId = props.getProperty('GITHUBB_CREDENTIALS_ID')
 String githubUsername = props.getProperty('GITHUBB_USERNAME')
 String githubTokenId = props.getProperty('GITHUBB_TOKEN_ID')
 String githubToken = props.getProperty('GITHUBB_TOKEN')
-String githubRepoUrl = props.getProperty('GITHUBB_REPO_URL')
 String githubOrg = props.getProperty('GITHUBB_ORG')
-String githubRepo = props.getProperty('GITHUBB_REPO')
+String infraJenkinsRepo = props.getProperty('INFRA_JENKINS_REPO')
 String staticSiteRepo = props.getProperty('STATIC_SITE_REPO')
+String tfGCPInfraRepo = props.getProperty('TF_GCP_INFRA_REPO')
 String dockerUsername = props.getProperty('DOCKER_USERNAME')
 String dockerToken = props.getProperty('DOCKER_TOKEN')
 String dockerImage = props.getProperty('DOCKER_IMAGE')
@@ -93,7 +93,7 @@ List<SCMSourceTrait> terraformTraits = [
 
 def githubSource = new GitHubSCMSource(
     githubOrg,
-    githubRepo
+    infraJenkinsRepo
 )
 githubSource.setCredentialsId(githubCredentialsId)
 githubSource.setApiUri("https://api.github.com")
@@ -104,6 +104,26 @@ def multibranchJob = folder.createProject(WorkflowMultiBranchProject.class, "ter
 def branchSource = new BranchSource(githubSource)
 multibranchJob.getSourcesList().add(branchSource)
 multibranchJob.save()
+
+
+// Multibranch pipeline for Terraform GCP infra
+List<SCMSourceTrait> tfGCPInfraTraits = [
+    new ForkPullRequestDiscoveryTrait(1, new ForkPullRequestDiscoveryTrait.TrustPermission())
+]
+
+def githubSource1 = new GitHubSCMSource(
+    githubOrg,
+    tfGCPInfraRepo
+)
+githubSource1.setCredentialsId(githubCredentialsId)
+githubSource1.setApiUri("https://api.github.com")
+githubSource1.setTraits(tfGCPInfraTraits)
+
+def folder1 = instance.createProject(Folder.class, "tf-gcp-infra")
+def multibranchJob1 = folder1.createProject(WorkflowMultiBranchProject.class, "terraform-validation")
+def branchSource1 = new BranchSource(githubSource1)
+multibranchJob1.getSourcesList().add(branchSource1)
+multibranchJob1.save()
 
 
 // Create multibranch pipeline job for docker image creation

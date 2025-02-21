@@ -32,15 +32,15 @@ variable "GITHUBB_TOKEN" {
   sensitive = true
 }
 
-variable "GITHUBB_REPO_URL" {
-  type = string
-}
-
 variable "GITHUBB_ORG" {
   type = string
 }
 
-variable "GITHUBB_REPO" {
+variable "INFRA_JENKINS_REPO" {
+  type = string
+}
+
+variable "TF_GCP_INFRA_REPO" {
   type = string
 }
 

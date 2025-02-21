@@ -17,6 +17,25 @@ source "amazon-ebs" "ubuntu" {
   force_delete_snapshot = true
 }
 
+locals {
+  env_vars = [
+    "JENKINS_ADMIN_USER=${var.JENKINS_ADMIN_USER}",
+    "JENKINS_ADMIN_PASSWORD=${var.JENKINS_ADMIN_PASSWORD}",
+    "JENKINS_URL=${var.JENKINS_URL}",
+    "GITHUBB_CREDENTIALS_ID=${var.GITHUBB_CREDENTIALS_ID}",
+    "GITHUBB_USERNAME=${var.GITHUBB_USERNAME}",
+    "GITHUBB_TOKEN_ID=${var.GITHUBB_TOKEN_ID}",
+    "GITHUBB_TOKEN=${var.GITHUBB_TOKEN}",
+    "GITHUBB_ORG=${var.GITHUBB_ORG}",
+    "INFRA_JENKINS_REPO=${var.INFRA_JENKINS_REPO}",
+    "STATIC_SITE_REPO=${var.STATIC_SITE_REPO}",
+    "TF_GCP_INFRA_REPO=${var.TF_GCP_INFRA_REPO}",
+    "DOCKER_USERNAME=${var.DOCKER_USERNAME}",
+    "DOCKER_TOKEN=${var.DOCKER_TOKEN}",
+    "DOCKER_IMAGE=${var.DOCKER_IMAGE}"
+  ]
+}
+
 build {
   sources = ["source.amazon-ebs.ubuntu"]
 
@@ -29,11 +48,7 @@ build {
       "packer-scripts/install-terraform.sh",
       "packer-scripts/install-docker.sh"
     ]
-    environment_vars = [
-      "JENKINS_URL=${var.JENKINS_URL}",
-      "JENKINS_ADMIN_USER=${var.JENKINS_ADMIN_USER}",
-      "JENKINS_ADMIN_PASSWORD=${var.JENKINS_ADMIN_PASSWORD}"
-    ]
+    environment_vars = local.env_vars
   }
 
   provisioner "file" {
@@ -51,21 +66,6 @@ build {
       "packer-scripts/file-permissions.sh",
       "packer-scripts/setup-jenkins.sh"
     ]
-    environment_vars = [
-      "JENKINS_ADMIN_USER=${var.JENKINS_ADMIN_USER}",
-      "JENKINS_ADMIN_PASSWORD=${var.JENKINS_ADMIN_PASSWORD}",
-      "JENKINS_URL=${var.JENKINS_URL}",
-      "GITHUBB_CREDENTIALS_ID=${var.GITHUBB_CREDENTIALS_ID}",
-      "GITHUBB_USERNAME=${var.GITHUBB_USERNAME}",
-      "GITHUBB_TOKEN_ID=${var.GITHUBB_TOKEN_ID}",
-      "GITHUBB_TOKEN=${var.GITHUBB_TOKEN}",
-      "GITHUBB_REPO_URL=${var.GITHUBB_REPO_URL}",
-      "GITHUBB_ORG=${var.GITHUBB_ORG}",
-      "GITHUBB_REPO=${var.GITHUBB_REPO}",
-      "STATIC_SITE_REPO=${var.STATIC_SITE_REPO}",
-      "DOCKER_USERNAME=${var.DOCKER_USERNAME}",
-      "DOCKER_TOKEN=${var.DOCKER_TOKEN}",
-      "DOCKER_IMAGE=${var.DOCKER_IMAGE}",
-    ]
+    environment_vars = local.env_vars
   }
 }
