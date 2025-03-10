@@ -3,4 +3,4 @@ unclassified:
     url: "https://jenkins.jkops.me"
 
 jobs:
-  - file: "/usr/local/terraform-validation.groovy"
+  - file: "/usr/local/infra-jenkins-terraform-validation.groovy"

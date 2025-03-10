@@ -43,8 +43,8 @@ build {
   }
 
   provisioner "file" {
-    source      = "multibranch-pipeline-jobs/infra-jenkins/terraform-validation.groovy"
-    destination = "/opt/jenkins-files/terraform-validation.groovy"
+    source      = "multibranch-pipeline-jobs/infra-jenkins-terraform-validation.groovy"
+    destination = "/opt/jenkins-files/infra-jenkins-terraform-validation.groovy"
   }
 
   provisioner "file" {
@@ -67,13 +67,13 @@ build {
 
   provisioner "shell" {
     scripts = [
-      "packer-scripts/install-jenkins.sh",
-      "packer-scripts/install-nginx.sh",
-      "packer-scripts/create-config-file.sh",
-      "packer-scripts/setup-jenkins.sh",
-      "packer-scripts/install-certbot.sh",
-      "packer-scripts/install-terraform.sh",
-      "packer-scripts/install-docker.sh",
+      "shell-scripts/install-jenkins.sh",
+      "shell-scripts/install-nginx.sh",
+      "shell-scripts/create-config-file.sh",
+      "shell-scripts/setup-jenkins.sh",
+      "shell-scripts/install-certbot.sh",
+      "shell-scripts/install-terraform.sh",
+      "shell-scripts/install-docker.sh",
     ]
   }
 

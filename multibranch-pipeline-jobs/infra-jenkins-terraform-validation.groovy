@@ -1,9 +1,7 @@
-folder('infra-jenkins')
-
-multibranchPipelineJob('infra-jenkins/terraform-validation') {
+multibranchPipelineJob('infra-jenkins-terraform-validation') {
     branchSources {
         github {
-            id('infra-jenkins/terraform-validation')
+            id('infra-jenkins-terraform-validation')
             repoOwner('cyse7125-sp25-team02')
             repository('infra-jenkins')
 
