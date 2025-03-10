@@ -1,0 +1,6 @@
+unclassified:
+  location:
+    url: "https://jenkins.jkops.me"
+
+jobs:
+  - file: "/usr/local/terraform-validation.groovy"

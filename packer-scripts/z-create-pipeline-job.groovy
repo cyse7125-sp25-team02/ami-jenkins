@@ -16,86 +16,16 @@ import jenkins.branch.BranchSource
 import org.jenkinsci.plugins.github_branch_source.BranchDiscoveryTrait
 import org.jenkinsci.plugins.github_branch_source.OriginPullRequestDiscoveryTrait
 
-
-// envs
-Properties props = new Properties()
-File envFile = new File('/etc/jenkins.env')
-if (envFile.exists()) {
-    props.load(envFile.newDataInputStream())
-} else {
-    throw new RuntimeException("/etc/jenkins.env file not found")
-}
-
-String jenkinsUrl = props.getProperty('JENKINS_URL')
-String githubCredentialsId = props.getProperty('GITHUBB_CREDENTIALS_ID')
-String githubUsername = props.getProperty('GITHUBB_USERNAME')
-String githubTokenId = props.getProperty('GITHUBB_TOKEN_ID')
-String githubToken = props.getProperty('GITHUBB_TOKEN')
-String githubOrg = props.getProperty('GITHUBB_ORG')
-String infraJenkinsRepo = props.getProperty('INFRA_JENKINS_REPO')
-String staticSiteRepo = props.getProperty('STATIC_SITE_REPO')
-String tfGCPInfraRepo = props.getProperty('TF_GCP_INFRA_REPO')
-String dockerUsername = props.getProperty('DOCKER_USERNAME')
-String dockerToken = props.getProperty('DOCKER_TOKEN')
-String dockerImage = props.getProperty('DOCKER_IMAGE')
-
-
-// Set Jenkins URL
-JenkinsLocationConfiguration location = JenkinsLocationConfiguration.get()
-location.setUrl(jenkinsUrl)
-location.save()
-
-
-// Create GitHub credentials
-def instance = Jenkins.instance
-def domain = Domain.global()
-def store = instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
-
-def tokenCred = new StringCredentialsImpl(
-    CredentialsScope.GLOBAL,
-    githubTokenId,
-    "GitHub Token",
-    Secret.fromString(githubToken)
-)
-store.addCredentials(domain, tokenCred)
-
-def githubCred = new UsernamePasswordCredentialsImpl(
-    CredentialsScope.GLOBAL,
-    githubCredentialsId,
-    "GitHub Credentials",
-    githubUsername,
-    githubToken
-)
-store.addCredentials(domain, githubCred)
-
-def dockerCred = new UsernamePasswordCredentialsImpl(
-    CredentialsScope.GLOBAL,
-    "dockerhub-credentials",
-    "Docker Hub Credentials",
-    dockerUsername,
-    dockerToken
-)
-store.addCredentials(domain, dockerCred)
-
-def dockerImageName = new StringCredentialsImpl(
-    CredentialsScope.GLOBAL,
-    "docker-image",
-    "Docker Image",
-    Secret.fromString(dockerImage)
-)
-store.addCredentials(domain, dockerImageName)
-
-
 // Create multibranch pipeline job for terraform-validation
 List<SCMSourceTrait> terraformTraits = [
     new ForkPullRequestDiscoveryTrait(1, new ForkPullRequestDiscoveryTrait.TrustPermission())
 ]
 
 def githubSource = new GitHubSCMSource(
-    githubOrg,
-    infraJenkinsRepo
+    "cyse7125-sp25-team02",
+    "infra-jenkins"
 )
-githubSource.setCredentialsId(githubCredentialsId)
+githubSource.setCredentialsId("github-credentials")
 githubSource.setApiUri("https://api.github.com")
 githubSource.setTraits(terraformTraits)
 
