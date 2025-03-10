@@ -8,21 +8,12 @@ variable "JENKINS_ADMIN_PASSWORD" {
   sensitive = true
 }
 
-variable "JENKINS_URL" {
-  type = string
-}
-
 variable "GITHUBB_CREDENTIALS_ID" {
   type      = string
   sensitive = true
 }
 
 variable "GITHUBB_USERNAME" {
-  type      = string
-  sensitive = true
-}
-
-variable "GITHUBB_TOKEN_ID" {
   type      = string
   sensitive = true
 }
@@ -36,18 +27,6 @@ variable "GITHUBB_ORG" {
   type = string
 }
 
-variable "INFRA_JENKINS_REPO" {
-  type = string
-}
-
-variable "TF_GCP_INFRA_REPO" {
-  type = string
-}
-
-variable "STATIC_SITE_REPO" {
-  type = string
-}
-
 variable "DOCKER_USERNAME" {
   type = string
 }
@@ -55,8 +34,4 @@ variable "DOCKER_USERNAME" {
 variable "DOCKER_TOKEN" {
   type      = string
   sensitive = true
-}
-
-variable "DOCKER_IMAGE" {
-  type = string
 }

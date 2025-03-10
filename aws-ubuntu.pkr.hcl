@@ -56,18 +56,12 @@ build {
     inline = [
       "sudo echo 'JENKINS_ADMIN_USER=${var.JENKINS_ADMIN_USER}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'JENKINS_ADMIN_PASSWORD=${var.JENKINS_ADMIN_PASSWORD}' | sudo tee -a /etc/jenkins.env > /dev/null",
-      "sudo echo 'JENKINS_URL=${var.JENKINS_URL}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'GITHUBB_CREDENTIALS_ID=${var.GITHUBB_CREDENTIALS_ID}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'GITHUBB_USERNAME=${var.GITHUBB_USERNAME}' | sudo tee -a /etc/jenkins.env > /dev/null",
-      "sudo echo 'GITHUBB_TOKEN_ID=${var.GITHUBB_TOKEN_ID}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'GITHUBB_TOKEN=${var.GITHUBB_TOKEN}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'GITHUBB_ORG=${var.GITHUBB_ORG}' | sudo tee -a /etc/jenkins.env > /dev/null",
-      "sudo echo 'INFRA_JENKINS_REPO=${var.INFRA_JENKINS_REPO}' | sudo tee -a /etc/jenkins.env > /dev/null",
-      "sudo echo 'TF_GCP_INFRA_REPO=${var.TF_GCP_INFRA_REPO}' | sudo tee -a /etc/jenkins.env > /dev/null",
-      "sudo echo 'STATIC_SITE_REPO=${var.STATIC_SITE_REPO}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'DOCKER_USERNAME=${var.DOCKER_USERNAME}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'DOCKER_TOKEN=${var.DOCKER_TOKEN}' | sudo tee -a /etc/jenkins.env > /dev/null",
-      "sudo echo 'DOCKER_IMAGE=${var.DOCKER_IMAGE}' | sudo tee -a /etc/jenkins.env > /dev/null"
     ]
   }
 
