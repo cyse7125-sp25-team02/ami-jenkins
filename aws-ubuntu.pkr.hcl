@@ -53,6 +53,11 @@ build {
   }
 
   provisioner "file" {
+    source      = "multibranch-pipeline-jobs/static-site-docker-image.groovy"
+    destination = "/opt/jenkins-files/static-site-docker-image.groovy"
+  }
+
+  provisioner "file" {
     source      = "jcasc.yaml"
     destination = "/opt/jenkins-files/jcasc.yaml"
   }
