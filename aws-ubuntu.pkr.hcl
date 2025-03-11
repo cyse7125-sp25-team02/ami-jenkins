@@ -62,6 +62,7 @@ build {
       "sudo echo 'GITHUBB_ORG=${var.GITHUBB_ORG}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'DOCKER_USERNAME=${var.DOCKER_USERNAME}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'DOCKER_TOKEN=${var.DOCKER_TOKEN}' | sudo tee -a /etc/jenkins.env > /dev/null",
+      "sudo echo 'GITHUBB_WEBHOOK_SECRET=${var.GITHUBB_WEBHOOK_SECRET}' | sudo tee -a /etc/jenkins.env > /dev/null",
     ]
   }
 

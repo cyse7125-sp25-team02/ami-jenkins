@@ -35,3 +35,8 @@ variable "DOCKER_TOKEN" {
   type      = string
   sensitive = true
 }
+
+variable "GITHUBB_WEBHOOK_SECRET" {
+  type      = string
+  sensitive = true
+}

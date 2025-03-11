@@ -16,11 +16,4 @@ multibranchPipelineJob('infra-jenkins-terraform-validation') {
             buildForkPRMerge(false)
         }
     }
-
-    configure { node ->
-        def webhookTrigger = node / triggers / 'com.igalg.jenkins.plugins.mswt.trigger.ComputedFolderWebHookTrigger' {
-            spec('')
-            token('cyse7125-sp25-team02')
-        }
-    }
 }
