@@ -4,3 +4,4 @@ unclassified:
 
 jobs:
   - file: "/usr/local/infra-jenkins-terraform-validation.groovy"
+  - file: "/usr/local/tf-gcp-infra-terraform-validation.groovy"

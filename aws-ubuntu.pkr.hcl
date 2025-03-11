@@ -48,6 +48,11 @@ build {
   }
 
   provisioner "file" {
+    source      = "multibranch-pipeline-jobs/tf-gcp-infra-terraform-validation.groovy"
+    destination = "/opt/jenkins-files/tf-gcp-infra-terraform-validation.groovy"
+  }
+
+  provisioner "file" {
     source      = "jcasc.yaml"
     destination = "/opt/jenkins-files/jcasc.yaml"
   }
