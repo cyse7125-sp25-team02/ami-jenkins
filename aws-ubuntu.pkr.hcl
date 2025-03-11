@@ -17,55 +17,81 @@ source "amazon-ebs" "ubuntu" {
   force_delete_snapshot = true
 }
 
-locals {
-  env_vars = [
-    "JENKINS_ADMIN_USER=${var.JENKINS_ADMIN_USER}",
-    "JENKINS_ADMIN_PASSWORD=${var.JENKINS_ADMIN_PASSWORD}",
-    "JENKINS_URL=${var.JENKINS_URL}",
-    "GITHUBB_CREDENTIALS_ID=${var.GITHUBB_CREDENTIALS_ID}",
-    "GITHUBB_USERNAME=${var.GITHUBB_USERNAME}",
-    "GITHUBB_TOKEN_ID=${var.GITHUBB_TOKEN_ID}",
-    "GITHUBB_TOKEN=${var.GITHUBB_TOKEN}",
-    "GITHUBB_ORG=${var.GITHUBB_ORG}",
-    "INFRA_JENKINS_REPO=${var.INFRA_JENKINS_REPO}",
-    "STATIC_SITE_REPO=${var.STATIC_SITE_REPO}",
-    "TF_GCP_INFRA_REPO=${var.TF_GCP_INFRA_REPO}",
-    "DOCKER_USERNAME=${var.DOCKER_USERNAME}",
-    "DOCKER_TOKEN=${var.DOCKER_TOKEN}",
-    "DOCKER_IMAGE=${var.DOCKER_IMAGE}"
-  ]
-}
-
 build {
   sources = ["source.amazon-ebs.ubuntu"]
 
   provisioner "shell" {
-    scripts = [
-      "packer-scripts/install-jenkins.sh",
-      "packer-scripts/install-nginx.sh",
-      "packer-scripts/create-config-file.sh",
-      "packer-scripts/install-certbot.sh",
-      "packer-scripts/install-terraform.sh",
-      "packer-scripts/install-docker.sh"
+    inline = [
+      "sudo mkdir -p /opt/jenkins-files",
+      "sudo chown ubuntu:ubuntu /opt/jenkins-files"
     ]
-    environment_vars = local.env_vars
   }
 
   provisioner "file" {
-    source      = "packer-scripts/jenkins.yaml"
-    destination = "/tmp/jenkins.yaml"
+    source      = "init-groovy-scripts/basic-setup.groovy"
+    destination = "/opt/jenkins-files/basic-setup.groovy"
   }
 
   provisioner "file" {
-    source      = "packer-scripts/z-create-pipeline-job.groovy"
-    destination = "/tmp/z-create-pipeline-job.groovy"
+    source      = "init-groovy-scripts/install-plugins.groovy"
+    destination = "/opt/jenkins-files/install-plugins.groovy"
+  }
+
+  provisioner "file" {
+    source      = "init-groovy-scripts/credentials.groovy"
+    destination = "/opt/jenkins-files/credentials.groovy"
+  }
+
+  provisioner "file" {
+    source      = "multibranch-pipeline-jobs/infra-jenkins-terraform-validation.groovy"
+    destination = "/opt/jenkins-files/infra-jenkins-terraform-validation.groovy"
+  }
+
+  provisioner "file" {
+    source      = "multibranch-pipeline-jobs/tf-gcp-infra-terraform-validation.groovy"
+    destination = "/opt/jenkins-files/tf-gcp-infra-terraform-validation.groovy"
+  }
+
+  provisioner "file" {
+    source      = "multibranch-pipeline-jobs/static-site-docker-image.groovy"
+    destination = "/opt/jenkins-files/static-site-docker-image.groovy"
+  }
+
+  provisioner "file" {
+    source      = "jcasc.yaml"
+    destination = "/opt/jenkins-files/jcasc.yaml"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "sudo echo 'JENKINS_ADMIN_USER=${var.JENKINS_ADMIN_USER}' | sudo tee -a /etc/jenkins.env > /dev/null",
+      "sudo echo 'JENKINS_ADMIN_PASSWORD=${var.JENKINS_ADMIN_PASSWORD}' | sudo tee -a /etc/jenkins.env > /dev/null",
+      "sudo echo 'GITHUBB_CREDENTIALS_ID=${var.GITHUBB_CREDENTIALS_ID}' | sudo tee -a /etc/jenkins.env > /dev/null",
+      "sudo echo 'GITHUBB_USERNAME=${var.GITHUBB_USERNAME}' | sudo tee -a /etc/jenkins.env > /dev/null",
+      "sudo echo 'GITHUBB_TOKEN=${var.GITHUBB_TOKEN}' | sudo tee -a /etc/jenkins.env > /dev/null",
+      "sudo echo 'GITHUBB_ORG=${var.GITHUBB_ORG}' | sudo tee -a /etc/jenkins.env > /dev/null",
+      "sudo echo 'DOCKER_USERNAME=${var.DOCKER_USERNAME}' | sudo tee -a /etc/jenkins.env > /dev/null",
+      "sudo echo 'DOCKER_TOKEN=${var.DOCKER_TOKEN}' | sudo tee -a /etc/jenkins.env > /dev/null",
+      "sudo echo 'GITHUBB_WEBHOOK_SECRET=${var.GITHUBB_WEBHOOK_SECRET}' | sudo tee -a /etc/jenkins.env > /dev/null",
+    ]
   }
 
   provisioner "shell" {
     scripts = [
-      "packer-scripts/file-permissions.sh",
-      "packer-scripts/setup-jenkins.sh"
+      "shell-scripts/install-jenkins.sh",
+      "shell-scripts/install-nginx.sh",
+      "shell-scripts/create-config-file.sh",
+      "shell-scripts/setup-jenkins.sh",
+      "shell-scripts/install-certbot.sh",
+      "shell-scripts/install-terraform.sh",
+      "shell-scripts/install-docker.sh",
     ]
-    environment_vars = local.env_vars
+  }
+
+  provisioner "shell" {
+    inline = [
+      "sudo systemctl daemon-reload",
+      "sudo systemctl restart jenkins"
+    ]
   }
 }

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 sudo tee /etc/nginx/sites-available/jenkins.jkops.me <<'EOF'
 upstream jenkins {
