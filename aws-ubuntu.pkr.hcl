@@ -73,6 +73,7 @@ build {
       "sudo echo 'DOCKER_USERNAME=${var.DOCKER_USERNAME}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'DOCKER_TOKEN=${var.DOCKER_TOKEN}' | sudo tee -a /etc/jenkins.env > /dev/null",
       "sudo echo 'GITHUBB_WEBHOOK_SECRET=${var.GITHUBB_WEBHOOK_SECRET}' | sudo tee -a /etc/jenkins.env > /dev/null",
+      "sudo echo 'GCP_SERVICE_ACCOUNT_KEY_B64=${base64encode(var.GCP_SERVICE_ACCOUNT_KEY)}' | sudo tee -a /etc/jenkins.env > /dev/null",
     ]
   }
 
@@ -85,6 +86,7 @@ build {
       "shell-scripts/install-certbot.sh",
       "shell-scripts/install-terraform.sh",
       "shell-scripts/install-docker.sh",
+      "shell-scripts/install-gcloud.sh"
     ]
   }
 
