@@ -28,6 +28,8 @@ sudo chmod 755 /var/lib/jenkins/init.groovy.d/credentials.groovy
 sudo mv /opt/jenkins-files/infra-jenkins-terraform-validation.groovy /usr/local/infra-jenkins-terraform-validation.groovy
 sudo mv /opt/jenkins-files/tf-gcp-infra-terraform-validation.groovy /usr/local/tf-gcp-infra-terraform-validation.groovy
 sudo mv /opt/jenkins-files/static-site-docker-image.groovy /usr/local/static-site-docker-image.groovy
+sudo mv /opt/jenkins-files/healthz-api-docker-image.groovy /usr/local/healthz-api-docker-image.groovy
+sudo mv /opt/jenkins-files/healthz-db-migration-docker-image.groovy /usr/local/healthz-db-migration-docker-image.groovy
 
 echo 'CASC_JENKINS_CONFIG="/var/lib/jenkins/casc_configs/jcasc.yaml"' | sudo tee -a /etc/environment
 sudo sed -i 's/\(JAVA_OPTS=-Djava\.awt\.headless=true\)/\1 -Djenkins.install.runSetupWizard=false/' /lib/systemd/system/jenkins.service

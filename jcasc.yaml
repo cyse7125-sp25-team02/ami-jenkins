@@ -6,3 +6,5 @@ jobs:
   - file: "/usr/local/infra-jenkins-terraform-validation.groovy"
   - file: "/usr/local/tf-gcp-infra-terraform-validation.groovy"
   - file: "/usr/local/static-site-docker-image.groovy"
+  - file: "/usr/local/healthz-api-docker-image.groovy"
+  - file: "/usr/local/healthz-db-migration-docker-image.groovy"

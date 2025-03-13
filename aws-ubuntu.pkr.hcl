@@ -58,6 +58,16 @@ build {
   }
 
   provisioner "file" {
+    source      = "multibranch-pipeline-jobs/healthz-api-docker-image.groovy"
+    destination = "/opt/jenkins-files/healthz-api-docker-image.groovy"
+  }
+
+  provisioner "file" {
+    source      = "multibranch-pipeline-jobs/healthz-db-migration-docker-image.groovy"
+    destination = "/opt/jenkins-files/healthz-db-migration-docker-image.groovy"
+  }
+
+  provisioner "file" {
     source      = "jcasc.yaml"
     destination = "/opt/jenkins-files/jcasc.yaml"
   }
