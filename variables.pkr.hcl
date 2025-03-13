@@ -40,3 +40,8 @@ variable "GITHUBB_WEBHOOK_SECRET" {
   type      = string
   sensitive = true
 }
+
+variable "GCP_SERVICE_ACCOUNT_KEY" {
+  type      = string
+  sensitive = true
+}
