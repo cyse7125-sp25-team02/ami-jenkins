@@ -1,18 +1,20 @@
-multibranchPipelineJob('infra-jenkins-terraform-validation') {
+folder('webapp-hello-world')
+
+multibranchPipelineJob('webapp-hello-world/healthz-api-docker-image') {
     branchSources {
         github {
-            id('infra-jenkins-terraform-validation')
+            id('healthz-api-docker-image')
             repoOwner('cyse7125-sp25-team02')
-            repository('infra-jenkins')
+            repository('webapp-hello-world')
 
             checkoutCredentialsId('github-credentials')
             scanCredentialsId('github-credentials')
 
-            buildOriginBranch(false)
+            buildOriginBranch(true)
             buildOriginBranchWithPR(false)
             buildOriginPRHead(false)
             buildOriginPRMerge(false)
-            buildForkPRHead(true)
+            buildForkPRHead(false)
             buildForkPRMerge(false)
         }
     }

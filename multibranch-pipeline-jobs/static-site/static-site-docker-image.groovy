@@ -1,4 +1,6 @@
-multibranchPipelineJob('static-site-docker-image') {
+folder('static-site')
+
+multibranchPipelineJob('static-site/static-site-docker-image') {
     branchSources {
         github {
             id('static-site-docker-image')

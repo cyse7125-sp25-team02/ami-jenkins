@@ -23,7 +23,8 @@ def plugins = [
     'docker-commons',
     'job-dsl',
     'configuration-as-code',
-    'multibranch-scan-webhook-trigger'
+    'multibranch-scan-webhook-trigger',
+    'conventional-commits'
 ]
 
 def instance = Jenkins.getInstance()
