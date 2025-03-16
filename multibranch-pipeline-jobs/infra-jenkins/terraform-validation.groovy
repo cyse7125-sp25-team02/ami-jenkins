@@ -1,11 +1,11 @@
-folder('tf-gcp-infra')
+folder('infra-jenkins')
 
-multibranchPipelineJob('tf-gcp-infra/tf-gcp-infra-terraform-validation') {
+multibranchPipelineJob('infra-jenkins/terraform-validation') {
     branchSources {
         github {
-            id('tf-gcp-infra-terraform-validation')
+            id('cyse7125-sp25-team02')
             repoOwner('cyse7125-sp25-team02')
-            repository('tf-gcp-infra')
+            repository('infra-jenkins')
 
             checkoutCredentialsId('github-credentials')
             scanCredentialsId('github-credentials')

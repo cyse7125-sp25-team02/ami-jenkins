@@ -1,9 +1,9 @@
 folder('static-site')
 
-multibranchPipelineJob('static-site/static-site-docker-image') {
+multibranchPipelineJob('static-site/docker-image-creation') {
     branchSources {
         github {
-            id('static-site-docker-image')
+            id('cyse7125-sp25-team02')
             repoOwner('cyse7125-sp25-team02')
             repository('static-site')
 

@@ -1,20 +1,20 @@
-folder('webapp-hello-world')
+folder('tf-gcp-infra')
 
-multibranchPipelineJob('webapp-hello-world/healthz-api-docker-image') {
+multibranchPipelineJob('tf-gcp-infra/terraform-validation') {
     branchSources {
         github {
-            id('healthz-api-docker-image')
+            id('cyse7125-sp25-team02')
             repoOwner('cyse7125-sp25-team02')
-            repository('webapp-hello-world')
+            repository('tf-gcp-infra')
 
             checkoutCredentialsId('github-credentials')
             scanCredentialsId('github-credentials')
 
-            buildOriginBranch(true)
+            buildOriginBranch(false)
             buildOriginBranchWithPR(false)
             buildOriginPRHead(false)
             buildOriginPRMerge(false)
-            buildForkPRHead(false)
+            buildForkPRHead(true)
             buildForkPRMerge(false)
         }
     }

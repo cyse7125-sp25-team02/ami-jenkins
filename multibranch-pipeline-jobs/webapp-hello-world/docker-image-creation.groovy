@@ -1,11 +1,11 @@
-folder('healthz-database-migration')
+folder('webapp-hello-world')
 
-multibranchPipelineJob('healthz-database-migration/healthz-db-migration-docker-image') {
+multibranchPipelineJob('webapp-hello-world/docker-image-creation') {
     branchSources {
         github {
-            id('healthz-db-migration-docker-image')
+            id('cyse7125-sp25-team02')
             repoOwner('cyse7125-sp25-team02')
-            repository('healthz-database-migration')
+            repository('webapp-hello-world')
 
             checkoutCredentialsId('github-credentials')
             scanCredentialsId('github-credentials')
