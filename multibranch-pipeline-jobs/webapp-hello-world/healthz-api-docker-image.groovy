@@ -1,4 +1,6 @@
-multibranchPipelineJob('healthz-api-docker-image') {
+folder('webapp-hello-world')
+
+multibranchPipelineJob('webapp-hello-world/healthz-api-docker-image') {
     branchSources {
         github {
             id('healthz-api-docker-image')

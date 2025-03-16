@@ -1,18 +1,20 @@
-multibranchPipelineJob('healthz-db-migration-docker-image') {
+folder('infra-jenkins')
+
+multibranchPipelineJob('infra-jenkins/infra-jenkins-terraform-validation') {
     branchSources {
         github {
-            id('healthz-db-migration-docker-image')
+            id('infra-jenkins-terraform-validation')
             repoOwner('cyse7125-sp25-team02')
-            repository('healthz-database-migration')
+            repository('infra-jenkins')
 
             checkoutCredentialsId('github-credentials')
             scanCredentialsId('github-credentials')
 
-            buildOriginBranch(true)
+            buildOriginBranch(false)
             buildOriginBranchWithPR(false)
             buildOriginPRHead(false)
             buildOriginPRMerge(false)
-            buildForkPRHead(false)
+            buildForkPRHead(true)
             buildForkPRMerge(false)
         }
     }

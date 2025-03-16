@@ -1,18 +1,20 @@
-multibranchPipelineJob('tf-gcp-infra-terraform-validation') {
+folder('healthz-database-migration')
+
+multibranchPipelineJob('healthz-database-migration/healthz-db-migration-docker-image') {
     branchSources {
         github {
-            id('tf-gcp-infra-terraform-validation')
+            id('healthz-db-migration-docker-image')
             repoOwner('cyse7125-sp25-team02')
-            repository('tf-gcp-infra')
+            repository('healthz-database-migration')
 
             checkoutCredentialsId('github-credentials')
             scanCredentialsId('github-credentials')
 
-            buildOriginBranch(false)
+            buildOriginBranch(true)
             buildOriginBranchWithPR(false)
             buildOriginPRHead(false)
             buildOriginPRMerge(false)
-            buildForkPRHead(true)
+            buildForkPRHead(false)
             buildForkPRMerge(false)
         }
     }

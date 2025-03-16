@@ -1,18 +1,20 @@
-multibranchPipelineJob('infra-jenkins-terraform-validation') {
+folder('static-site')
+
+multibranchPipelineJob('static-site/static-site-docker-image') {
     branchSources {
         github {
-            id('infra-jenkins-terraform-validation')
+            id('static-site-docker-image')
             repoOwner('cyse7125-sp25-team02')
-            repository('infra-jenkins')
+            repository('static-site')
 
             checkoutCredentialsId('github-credentials')
             scanCredentialsId('github-credentials')
 
-            buildOriginBranch(false)
+            buildOriginBranch(true)
             buildOriginBranchWithPR(false)
             buildOriginPRHead(false)
             buildOriginPRMerge(false)
-            buildForkPRHead(true)
+            buildForkPRHead(false)
             buildForkPRMerge(false)
         }
     }

@@ -1,18 +1,20 @@
-multibranchPipelineJob('static-site-docker-image') {
+folder('tf-gcp-infra')
+
+multibranchPipelineJob('tf-gcp-infra/tf-gcp-infra-terraform-validation') {
     branchSources {
         github {
-            id('static-site-docker-image')
+            id('tf-gcp-infra-terraform-validation')
             repoOwner('cyse7125-sp25-team02')
-            repository('static-site')
+            repository('tf-gcp-infra')
 
             checkoutCredentialsId('github-credentials')
             scanCredentialsId('github-credentials')
 
-            buildOriginBranch(true)
+            buildOriginBranch(false)
             buildOriginBranchWithPR(false)
             buildOriginPRHead(false)
             buildOriginPRMerge(false)
-            buildForkPRHead(false)
+            buildForkPRHead(true)
             buildForkPRMerge(false)
         }
     }

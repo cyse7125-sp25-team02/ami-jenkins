@@ -23,53 +23,13 @@ build {
   provisioner "shell" {
     inline = [
       "sudo mkdir -p /opt/jenkins-files",
-      "sudo chown ubuntu:ubuntu /opt/jenkins-files"
+      "sudo chown -R ubuntu:ubuntu /opt/jenkins-files"
     ]
   }
 
   provisioner "file" {
-    source      = "init-groovy-scripts/basic-setup.groovy"
-    destination = "/opt/jenkins-files/basic-setup.groovy"
-  }
-
-  provisioner "file" {
-    source      = "init-groovy-scripts/install-plugins.groovy"
-    destination = "/opt/jenkins-files/install-plugins.groovy"
-  }
-
-  provisioner "file" {
-    source      = "init-groovy-scripts/credentials.groovy"
-    destination = "/opt/jenkins-files/credentials.groovy"
-  }
-
-  provisioner "file" {
-    source      = "multibranch-pipeline-jobs/infra-jenkins-terraform-validation.groovy"
-    destination = "/opt/jenkins-files/infra-jenkins-terraform-validation.groovy"
-  }
-
-  provisioner "file" {
-    source      = "multibranch-pipeline-jobs/tf-gcp-infra-terraform-validation.groovy"
-    destination = "/opt/jenkins-files/tf-gcp-infra-terraform-validation.groovy"
-  }
-
-  provisioner "file" {
-    source      = "multibranch-pipeline-jobs/static-site-docker-image.groovy"
-    destination = "/opt/jenkins-files/static-site-docker-image.groovy"
-  }
-
-  provisioner "file" {
-    source      = "multibranch-pipeline-jobs/healthz-api-docker-image.groovy"
-    destination = "/opt/jenkins-files/healthz-api-docker-image.groovy"
-  }
-
-  provisioner "file" {
-    source      = "multibranch-pipeline-jobs/healthz-db-migration-docker-image.groovy"
-    destination = "/opt/jenkins-files/healthz-db-migration-docker-image.groovy"
-  }
-
-  provisioner "file" {
-    source      = "jcasc.yaml"
-    destination = "/opt/jenkins-files/jcasc.yaml"
+    source      = "jenkins-config.zip"
+    destination = "/opt/jenkins-files/jenkins-config.zip"
   }
 
   provisioner "shell" {
@@ -92,18 +52,12 @@ build {
       "shell-scripts/install-jenkins.sh",
       "shell-scripts/install-nginx.sh",
       "shell-scripts/create-config-file.sh",
+      "shell-scripts/install-unzip.sh",
       "shell-scripts/setup-jenkins.sh",
       "shell-scripts/install-certbot.sh",
       "shell-scripts/install-terraform.sh",
       "shell-scripts/install-docker.sh",
       "shell-scripts/install-gcloud.sh"
-    ]
-  }
-
-  provisioner "shell" {
-    inline = [
-      "sudo systemctl daemon-reload",
-      "sudo systemctl restart jenkins"
     ]
   }
 }
