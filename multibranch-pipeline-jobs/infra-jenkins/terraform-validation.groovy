@@ -18,4 +18,10 @@ multibranchPipelineJob('infra-jenkins/terraform-validation') {
             buildForkPRMerge(false)
         }
     }
+
+    factory {
+        workflowBranchProjectFactory {
+            scriptPath('jenkinsfiles/Jenkinsfile.terraform-validation')
+        }
+    }
 }

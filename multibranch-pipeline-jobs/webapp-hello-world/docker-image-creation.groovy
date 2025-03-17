@@ -18,4 +18,10 @@ multibranchPipelineJob('webapp-hello-world/docker-image-creation') {
             buildForkPRMerge(false)
         }
     }
+
+    factory {
+        workflowBranchProjectFactory {
+            scriptPath('jenkinsfiles/Jenkinsfile.docker-image-creation')
+        }
+    }
 }
