@@ -6,16 +6,22 @@ multibranchPipelineJob('webapp-hello-world/docker-image-creation') {
             id('cyse7125-sp25-team02')
             repoOwner('cyse7125-sp25-team02')
             repository('webapp-hello-world')
-
             checkoutCredentialsId('github-credentials')
             scanCredentialsId('github-credentials')
+        }
+    }
 
-            buildOriginBranch(true)
-            buildOriginBranchWithPR(false)
-            buildOriginPRHead(false)
-            buildOriginPRMerge(false)
-            buildForkPRHead(false)
-            buildForkPRMerge(false)
+    configure { node ->
+        def traits = node / sources / data / 'jenkins.branch.BranchSource' / source / traits
+        
+        traits << 'org.jenkinsci.plugins.github_branch_source.BranchDiscoveryTrait' {
+            strategyId(1)
+        }
+        
+        traits << 'org.jenkinsci.plugins.githubScmTraitNotificationContext.NotificationContextTrait' {
+            contextLabel('docker-image-creation')
+            typeSuffix(false)
+            multipleStatuses(false)
         }
     }
 

@@ -6,16 +6,23 @@ multibranchPipelineJob('infra-jenkins/terraform-validation') {
             id('cyse7125-sp25-team02')
             repoOwner('cyse7125-sp25-team02')
             repository('infra-jenkins')
-
             checkoutCredentialsId('github-credentials')
             scanCredentialsId('github-credentials')
+        }
+    }
 
-            buildOriginBranch(false)
-            buildOriginBranchWithPR(false)
-            buildOriginPRHead(false)
-            buildOriginPRMerge(false)
-            buildForkPRHead(true)
-            buildForkPRMerge(false)
+    configure { node ->
+        def traits = node / sources / data / 'jenkins.branch.BranchSource' / source / traits
+        
+        traits << 'org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait' {
+            strategyId(2)
+            trust(class: 'org.jenkinsci.plugins.github_branch_source.ForkPullRequestDiscoveryTrait$TrustPermission')
+        }
+        
+        traits << 'org.jenkinsci.plugins.githubScmTraitNotificationContext.NotificationContextTrait' {
+            contextLabel('terraform-validation')
+            typeSuffix(false)
+            multipleStatuses(false)
         }
     }
 
