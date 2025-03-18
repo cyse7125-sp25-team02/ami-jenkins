@@ -24,7 +24,8 @@ def plugins = [
     'job-dsl',
     'configuration-as-code',
     'multibranch-scan-webhook-trigger',
-    'conventional-commits'
+    'conventional-commits',
+    'github-scm-trait-notification-context'
 ]
 
 def instance = Jenkins.getInstance()
