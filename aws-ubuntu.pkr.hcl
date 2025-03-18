@@ -57,7 +57,8 @@ build {
       "shell-scripts/install-certbot.sh",
       "shell-scripts/install-terraform.sh",
       "shell-scripts/install-docker.sh",
-      "shell-scripts/install-gcloud.sh"
+      "shell-scripts/install-gcloud.sh",
+      "shell-scripts/install-node.sh",
     ]
   }
 }
