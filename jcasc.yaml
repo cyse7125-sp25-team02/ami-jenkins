@@ -5,11 +5,20 @@ unclassified:
 jobs:
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/infra-jenkins/terraform-validation.groovy"
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/infra-jenkins/conventional-commit-check.groovy"
+
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/tf-gcp-infra/terraform-validation.groovy"
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/tf-gcp-infra/conventional-commit-check.groovy"
+
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/static-site/docker-image-creation.groovy"
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/static-site/conventional-commit-check.groovy"
+
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/webapp-hello-world/docker-image-creation.groovy"
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/webapp-hello-world/conventional-commit-check.groovy"
+
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/healthz-database-migration/docker-image-creation.groovy"
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/healthz-database-migration/conventional-commit-check.groovy"
+
+  - file: "/opt/jenkins-files/multibranch-pipeline-jobs/api-server/conventional-commit-check.groovy"
+  - file: "/opt/jenkins-files/multibranch-pipeline-jobs/api-server/docker-image-creation.groovy"
+
+  - file: "/opt/jenkins-files/multibranch-pipeline-jobs/ami-jenkins/conventional-commit-check.groovy"
