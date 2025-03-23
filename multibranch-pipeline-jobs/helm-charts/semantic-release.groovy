@@ -1,0 +1,33 @@
+folder('helm-charts')
+
+multibranchPipelineJob('helm-charts/semantic-release') {
+    branchSources {
+        github {
+            id('cyse7125-sp25-team02')
+            repoOwner('cyse7125-sp25-team02')
+            repository('helm-charts')
+            checkoutCredentialsId('github-credentials')
+            scanCredentialsId('github-credentials')
+        }
+    }
+
+    configure { node ->
+        def traits = node / sources / data / 'jenkins.branch.BranchSource' / source / traits
+        
+        traits << 'org.jenkinsci.plugins.github_branch_source.BranchDiscoveryTrait' {
+            strategyId(1)
+        }
+        
+        traits << 'org.jenkinsci.plugins.githubScmTraitNotificationContext.NotificationContextTrait' {
+            contextLabel('semantic-release')
+            typeSuffix(false)
+            multipleStatuses(false)
+        }
+    }
+
+    factory {
+        workflowBranchProjectFactory {
+            scriptPath('jenkinsfiles/Jenkinsfile.semantic-release')
+        }
+    }
+}

@@ -59,6 +59,7 @@ build {
       "shell-scripts/install-docker.sh",
       "shell-scripts/install-gcloud.sh",
       "shell-scripts/install-node.sh",
+      "shell-scripts/install-helm.sh",
     ]
   }
 }
