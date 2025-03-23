@@ -40,6 +40,14 @@ def githubCred = new UsernamePasswordCredentialsImpl(
 )
 store.addCredentials(domain, githubCred)
 
+def githubTokenCred = new StringCredentialsImpl(
+    CredentialsScope.GLOBAL,
+    "github-token",
+    "GitHub Token",
+    Secret.fromString(githubToken)
+)
+store.addCredentials(domain, githubTokenCred)
+
 def dockerCred = new UsernamePasswordCredentialsImpl(
     CredentialsScope.GLOBAL,
     "docker-hub-credentials",

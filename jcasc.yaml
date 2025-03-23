@@ -27,3 +27,5 @@ jobs:
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/database-migration/conventional-commit-check.groovy"
 
   - file: "/opt/jenkins-files/multibranch-pipeline-jobs/helm-charts/conventional-commit-check.groovy"
+  - file: "/opt/jenkins-files/multibranch-pipeline-jobs/helm-charts/semantic-release.groovy"
+  - file: "/opt/jenkins-files/multibranch-pipeline-jobs/helm-charts/helm-chart-validation.groovy"
