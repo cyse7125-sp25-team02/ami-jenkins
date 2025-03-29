@@ -18,3 +18,7 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 sudo usermod -aG docker jenkins
 docker --version
+
+sudo apt-get install -y qemu-user-static binfmt-support
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+ls /proc/sys/fs/binfmt_misc/
